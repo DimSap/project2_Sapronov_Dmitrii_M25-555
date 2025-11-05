@@ -58,6 +58,6 @@
 Запуск
 ------
 ```
-make project
+make database
 ```
 
