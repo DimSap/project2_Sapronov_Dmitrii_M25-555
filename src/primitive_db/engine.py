@@ -1,5 +1,6 @@
 import os
 import shlex
+
 import prompt
 
 from src.primitive_db.core import create_table, drop_table
