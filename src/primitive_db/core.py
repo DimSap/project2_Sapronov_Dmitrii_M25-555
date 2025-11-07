@@ -21,7 +21,8 @@ def _parse_columns(columns):
         if not name:
             return False, [], raw
         if name.upper() == RESERVED_ID_NAME:
-            return False, [], name
+            # Skip ID field if provided by user - it's added automatically
+            continue
         if type_str not in ALLOWED_TYPES:
             return False, [], type_str
         if name in seen_names:
