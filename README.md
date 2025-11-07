@@ -3,6 +3,32 @@
 
 Модуль предоставляет простейшую работу с таблицами и хранит метаданные в JSON (`db_meta.json`).
 
+Установка
+-------
+
+- С Poetry:
+```bash
+poetry install
+```
+
+- Или через Makefile:
+```bash
+make install
+```
+
+Запуск
+-------
+
+- Через Poetry (скрипт `project`):
+```bash
+poetry run project
+```
+
+- Или через Makefile:
+```bash
+make project
+```
+
 Команды
 -------
 - **create_table**: `create_table <имя_таблицы> <столбец1:тип> <столбец2:тип> ...` — создать таблицу. Автоматически добавляется столбец `ID:int`.
@@ -61,3 +87,7 @@
 make database
 ```
 
+Пример запуска 
+
+
+[![asciicast](https://asciinema.org/a/cjb2UNtT8qwanVE30cWiy5MmO.svg)](https://asciinema.org/a/cjb2UNtT8qwanVE30cWiy5MmO)
