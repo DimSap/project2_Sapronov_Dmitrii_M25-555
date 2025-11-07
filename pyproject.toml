@@ -12,6 +12,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0"
 prompt = "^0.4.1"
+prettytable = "^3.16.0"
 
 
 [tool.poetry.group.dev.dependencies]
