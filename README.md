@@ -21,7 +21,7 @@ make install
 
 - Через Poetry (скрипт `project`):
 ```bash
-poetry run project
+poetry run database
 ```
 
 - Или через Makefile:
@@ -50,7 +50,7 @@ CRUD-операции
 - Строковые значения записывайте в двойных кавычках, булевы — `true`/`false`.
 - Все данные сохраняются между запусками в JSON файлах.
 
-Новые возможности
+Работа декораторов
 -----------------
 - Централизованная обработка ошибок через декоратор `handle_db_errors`: понятные сообщения при `FileNotFoundError`, `KeyError` и `ValueError`.
 - Подтверждение опасных операций (`drop_table`, `delete`) с помощью `confirm_action` — выполнение продолжается только после ответа `y`.
@@ -150,4 +150,4 @@ make project
 
 Демонстрация работы Декораторов.
 
-[![asciicast](https://https://asciinema.org/a/5h38fx0GSQ5A0SmX91pHidRPR.svg)](https://asciinema.org/a/5h38fx0GSQ5A0SmX91pHidRPR)
+[![asciicast](https://asciinema.org/a/5h38fx0GSQ5A0SmX91pHidRPR.svg)](https://asciinema.org/a/5h38fx0GSQ5A0SmX91pHidRPR)
