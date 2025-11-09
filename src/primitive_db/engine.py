@@ -115,6 +115,8 @@ def _handle_insert(metadata, raw_command):
     table_data = load_table_data(table_name)
     before_count = len(table_data)
     updated_data = insert(metadata, table_name, parsed_values, table_data)
+    if updated_data is None:
+        return
     if len(updated_data) > before_count:
         save_table_data(table_name, updated_data)
 
@@ -150,7 +152,7 @@ def _handle_select(metadata, raw_command):
         return
 
     table_data = load_table_data(table_name)
-    rows = select(table_data, where_clause)
+    rows = select(table_data, where_clause, table_name)
     if not rows:
         print("Записи по условию не найдены.")
         return
@@ -210,6 +212,8 @@ def _handle_update(metadata, raw_command):
     table_data = load_table_data(table_name)
     before_snapshot = [dict(record) for record in table_data]
     updated_data = update(table_data, set_clause, where_clause, table_name)
+    if updated_data is None:
+        return
     if before_snapshot != updated_data:
         save_table_data(table_name, updated_data)
 
@@ -247,6 +251,8 @@ def _handle_delete(metadata, raw_command):
     table_data = load_table_data(table_name)
     before_count = len(table_data)
     updated_data = delete(table_data, where_clause, table_name)
+    if updated_data is None:
+        return
     if len(updated_data) != before_count:
         save_table_data(table_name, updated_data)
 
@@ -336,6 +342,8 @@ def run():
             columns = args[2:]
             before = metadata
             after = create_table(before, table_name, columns)
+            if after is None:
+                continue
             _save_if_changed(before, after)
             continue
 
@@ -347,6 +355,8 @@ def run():
             table_name = args[1]
             before = metadata
             after = drop_table(before, table_name)
+            if after is None:
+                continue
             _save_if_changed(before, after)
             continue
 

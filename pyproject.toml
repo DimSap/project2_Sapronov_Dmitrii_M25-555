@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "project2-sapronov-dmitrii-m25-555"
-version = "0.1.0"
+version = "0.1.2"
 description = ""
 authors = ["dmitriy.sapronov <dmitriy.sapronov@sbermarket.ru>"]
 readme = "README.md"

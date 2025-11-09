@@ -50,6 +50,13 @@ CRUD-операции
 - Строковые значения записывайте в двойных кавычках, булевы — `true`/`false`.
 - Все данные сохраняются между запусками в JSON файлах.
 
+Новые возможности
+-----------------
+- Централизованная обработка ошибок через декоратор `handle_db_errors`: понятные сообщения при `FileNotFoundError`, `KeyError` и `ValueError`.
+- Подтверждение опасных операций (`drop_table`, `delete`) с помощью `confirm_action` — выполнение продолжается только после ответа `y`.
+- Замер времени для операций работы с файлами (`insert`, `select`) через `log_time`.
+- Кэширование повторяющихся запросов выбора записей: одинаковые `select` выполняются быстрее за счет замыкания с внутренним кэшем.
+
 Хранение данных
 ---------------
 Метаданные находятся в `src/primitive_db/db_meta.json`. Каждая таблица хранит записи в отдельном файле `src/primitive_db/data/<имя_таблицы>.json`.
@@ -141,3 +148,6 @@ make project
 
 [![asciicast](https://asciinema.org/a/a8Bn3Ob7BGpbYkZexVBiF4JJI.svg)](https://asciinema.org/a/a8Bn3Ob7BGpbYkZexVBiF4JJI)
 
+Демонстрация работы Декораторов.
+
+[![asciicast](https://https://asciinema.org/a/5h38fx0GSQ5A0SmX91pHidRPR.svg)](https://asciinema.org/a/5h38fx0GSQ5A0SmX91pHidRPR)

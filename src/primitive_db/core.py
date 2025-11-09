@@ -1,6 +1,9 @@
 
+from src.decorators import confirm_action, create_cacher, handle_db_errors, log_time
+
 ALLOWED_TYPES = {"int", "str", "bool"}
 RESERVED_ID_NAME = "ID"
+_select_cache = create_cacher()
 
 
 def _parse_columns(columns):
@@ -32,6 +35,14 @@ def _parse_columns(columns):
     return True, parsed, ""
 
 
+def _make_select_key(table_data, where_clause, table_name):
+    records = table_data if table_data is not None else []
+    records_key = tuple(tuple(sorted(record.items())) for record in records)
+    where_key = None if not where_clause else tuple(sorted(where_clause.items()))
+    return table_name, records_key, where_key
+
+
+@handle_db_errors
 def create_table(metadata, table_name, columns):
     """Create a table definition inside metadata.
 
@@ -41,17 +52,14 @@ def create_table(metadata, table_name, columns):
     Returns new metadata dict (may be the same if an error occurred).
     """
     if not table_name:
-        print(f"Некорректное значение: {table_name}. Попробуйте снова.")
-        return metadata
+        raise ValueError(f"Некорректное значение: {table_name}. Попробуйте снова.")
 
     if table_name in metadata:
-        print(f"Ошибка: Таблица \"{table_name}\" уже существует.")
-        return metadata
+        raise ValueError(f"Ошибка: Таблица \"{table_name}\" уже существует.")
 
     ok, parsed_columns, err_val = _parse_columns(columns)
     if not ok:
-        print(f"Некорректное значение: {err_val}. Попробуйте снова.")
-        return metadata
+        raise ValueError(f"Некорректное значение: {err_val}. Попробуйте снова.")
 
     # Build ordered mapping: ID first
     new_table = {RESERVED_ID_NAME: "int"}
@@ -67,15 +75,17 @@ def create_table(metadata, table_name, columns):
     return new_metadata
 
 
+@handle_db_errors
+@confirm_action("удаление таблицы")
 def drop_table(metadata, table_name):
     """Drop a table definition from metadata if it exists. Prints messages."""
     if table_name not in metadata:
-        print(f"Ошибка: Таблица \"{table_name}\" не существует.")
-        return metadata
+        raise KeyError(table_name)
 
     new_metadata = dict(metadata)
     del new_metadata[table_name]
     print(f"Таблица \"{table_name}\" успешно удалена.")
+    _select_cache.clear()
     return new_metadata
 
 
@@ -96,17 +106,17 @@ def _matches(record, where_clause):
     return True
 
 
+@handle_db_errors
+@log_time
 def insert(metadata, table_name, values, table_data=None):
     if table_name not in metadata:
-        print(f"Ошибка: Таблица \"{table_name}\" не существует.")
-        return table_data if table_data is not None else []
+        raise KeyError(table_name)
 
     schema = metadata[table_name]
     ordered_columns = [column for column in schema.keys() if column != RESERVED_ID_NAME]
 
     if len(values) != len(ordered_columns):
-        print("Некорректное количество значений. Попробуйте снова.")
-        return table_data if table_data is not None else []
+        raise ValueError("Некорректное количество значений. Попробуйте снова.")
 
     if table_data is None:
         table_data = []
@@ -114,8 +124,7 @@ def insert(metadata, table_name, values, table_data=None):
     for column_name, value in zip(ordered_columns, values):
         expected_type = schema[column_name]
         if not _is_value_of_type(value, expected_type):
-            print(f"Некорректный тип для столбца {column_name}. Ожидался {expected_type}.")
-            return table_data
+            raise ValueError(f"Некорректный тип для столбца {column_name}. Ожидался {expected_type}.")
 
     if table_data:
         max_id = max(item.get(RESERVED_ID_NAME, 0) for item in table_data)
@@ -128,17 +137,25 @@ def insert(metadata, table_name, values, table_data=None):
         new_record[column_name] = value
 
     table_data.append(new_record)
+    _select_cache.clear()
     print(f"Запись с ID={new_id} успешно добавлена в таблицу \"{table_name}\".")
     return table_data
 
 
-def select(table_data, where_clause=None):
-    if not where_clause:
-        return table_data
+@handle_db_errors
+@log_time
+def select(table_data, where_clause=None, table_name=None):
+    key = _make_select_key(table_data, where_clause, table_name)
 
-    return [record for record in table_data if _matches(record, where_clause)]
+    def compute():
+        if not where_clause:
+            return table_data
+        return [record for record in table_data if _matches(record, where_clause)]
+
+    return _select_cache(key, compute)
 
 
+@handle_db_errors
 def update(table_data, set_clause, where_clause, table_name=None):
     changed_ids = []
     for record in table_data:
@@ -162,9 +179,12 @@ def update(table_data, set_clause, where_clause, table_name=None):
             print(f"Записи с ID={joined} в таблице \"{table_name}\" успешно обновлены.")
         else:
             print(f"Записи с ID={joined} успешно обновлены.")
+    _select_cache.clear()
     return table_data
 
 
+@handle_db_errors
+@confirm_action("удаление записей")
 def delete(table_data, where_clause, table_name=None):
     remaining = []
     deleted_ids = []
@@ -189,6 +209,7 @@ def delete(table_data, where_clause, table_name=None):
             print(f"Записи с ID={joined} успешно удалены из таблицы \"{table_name}\".")
         else:
             print(f"Записи с ID={joined} успешно удалены из таблицы.")
+    _select_cache.clear()
     return remaining
 
 
