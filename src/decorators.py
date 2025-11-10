@@ -1,6 +1,8 @@
 import time
 from functools import wraps
 
+from src.constants import CONFIRMATION_POSITIVE_ANSWER
+
 
 def handle_db_errors(func):
     @wraps(func)
@@ -24,7 +26,7 @@ def confirm_action(action_name):
         @wraps(func)
         def wrapper(*args, **kwargs):
             answer = input(f'Вы уверены, что хотите выполнить "{action_name}"? [y/n]: ').strip().lower()
-            if answer != "y":
+            if answer != CONFIRMATION_POSITIVE_ANSWER:
                 print("Операция отменена.")
                 return args[0] if args else None
             return func(*args, **kwargs)

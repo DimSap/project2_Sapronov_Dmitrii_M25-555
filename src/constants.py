@@ -1,0 +1,22 @@
+import os
+
+
+SRC_DIR = os.path.dirname(__file__)
+PRIMITIVE_DB_DIR = os.path.join(SRC_DIR, "primitive_db")
+
+TYPE_INT = "int"
+TYPE_STR = "str"
+TYPE_BOOL = "bool"
+ALLOWED_TYPES = {TYPE_INT, TYPE_STR, TYPE_BOOL}
+
+RESERVED_ID_NAME = "ID"
+
+META_FILENAME = "db_meta.json"
+META_FILEPATH = os.path.join(PRIMITIVE_DB_DIR, META_FILENAME)
+
+DATA_DIRECTORY_NAME = "data"
+DATA_DIR = os.path.join(PRIMITIVE_DB_DIR, DATA_DIRECTORY_NAME)
+TABLE_FILE_EXTENSION = ".json"
+
+CONFIRMATION_POSITIVE_ANSWER = "y"
+

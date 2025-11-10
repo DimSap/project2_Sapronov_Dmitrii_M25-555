@@ -1,7 +1,7 @@
 import json
 import os
 
-DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
+from src.constants import DATA_DIR, TABLE_FILE_EXTENSION
 
 
 def load_metadata(filepath):
@@ -27,7 +27,7 @@ def save_metadata(filepath, data):
 
 
 def get_table_filepath(table_name):
-    return os.path.join(DATA_DIR, f"{table_name}.json")
+    return os.path.join(DATA_DIR, f"{table_name}{TABLE_FILE_EXTENSION}")
 
 
 def load_table_data(table_name):

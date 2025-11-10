@@ -1,14 +1,12 @@
-import os
 import shlex
 
 import prompt
 from prettytable import PrettyTable
 
+from src.constants import META_FILEPATH, RESERVED_ID_NAME, TYPE_BOOL, TYPE_INT, TYPE_STR
 from src.primitive_db.core import create_table, delete, drop_table, insert, select, update
 from src.primitive_db.parser import parse_set_clause, parse_values_list, parse_where_clause
 from src.primitive_db.utils import load_metadata, load_table_data, save_metadata, save_table_data
-
-META_FILEPATH = os.path.join(os.path.dirname(__file__), "db_meta.json")
 
 
 def print_help():
@@ -37,17 +35,17 @@ def _save_if_changed(before, after):
 
 
 def _value_matches_type(value, expected_type):
-    if expected_type == "int":
+    if expected_type == TYPE_INT:
         return isinstance(value, int)
-    if expected_type == "str":
+    if expected_type == TYPE_STR:
         return isinstance(value, str)
-    if expected_type == "bool":
+    if expected_type == TYPE_BOOL:
         return isinstance(value, bool)
     return False
 
 
 def _validate_values(schema, values):
-    ordered_columns = [column for column in schema.keys() if column != "ID"]
+    ordered_columns = [column for column in schema.keys() if column != RESERVED_ID_NAME]
     for column_name, value in zip(ordered_columns, values):
         expected_type = schema[column_name]
         if not _value_matches_type(value, expected_type):
@@ -194,8 +192,8 @@ def _handle_update(metadata, raw_command):
 
     schema = metadata[table_name]
     set_clause = parse_set_clause(set_raw)
-    if "ID" in set_clause:
-        print("Изменение столбца ID запрещено.")
+    if RESERVED_ID_NAME in set_clause:
+        print(f"Изменение столбца {RESERVED_ID_NAME} запрещено.")
         return
 
     if not _validate_clause(schema, set_clause):
