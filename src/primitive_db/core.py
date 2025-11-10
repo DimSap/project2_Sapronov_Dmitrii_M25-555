@@ -108,6 +108,7 @@ def _matches(record, where_clause):
 @handle_db_errors
 @log_time
 def insert(metadata, table_name, values, table_data=None):
+    """Add a new record to the table after validating schema and types."""
     if table_name not in metadata:
         raise KeyError(table_name)
 
@@ -144,6 +145,7 @@ def insert(metadata, table_name, values, table_data=None):
 @handle_db_errors
 @log_time
 def select(table_data, where_clause=None, table_name=None):
+    """Return table records, optionally filtered, with memoization support."""
     key = _make_select_key(table_data, where_clause, table_name)
 
     def compute():
@@ -156,6 +158,7 @@ def select(table_data, where_clause=None, table_name=None):
 
 @handle_db_errors
 def update(table_data, set_clause, where_clause, table_name=None):
+    """Apply values from set_clause to records matching where_clause."""
     changed_ids = []
     for record in table_data:
         if _matches(record, where_clause):
@@ -185,6 +188,7 @@ def update(table_data, set_clause, where_clause, table_name=None):
 @handle_db_errors
 @confirm_action("удаление записей")
 def delete(table_data, where_clause, table_name=None):
+    """Remove records that satisfy where_clause and report deleted IDs."""
     remaining = []
     deleted_ids = []
     for record in table_data:

@@ -19,14 +19,14 @@ make install
 Запуск
 -------
 
-- Через Poetry (скрипт `project`):
+- Через Poetry (скрипт `database`):
 ```bash
 poetry run database
 ```
 
 - Или через Makefile:
 ```bash
-make project
+make run
 ```
 
 Команды схемы
